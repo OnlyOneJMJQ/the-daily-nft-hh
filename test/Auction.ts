@@ -7,15 +7,11 @@ import { expect } from "chai";
 import hre from "hardhat";
 
 describe("Auction", function () {
-    // We define a fixture to reuse the same setup in every test.
-    // We use loadFixture to run this setup once, snapshot that state,
-    // and reset Hardhat Network to that snapshot in every test.
     async function deployOneDayAuctionFixture() {
         const ONE_DAY_IN_SECS = 24 * 60 * 60;
 
         const auctionTime = (await time.latest()) + ONE_DAY_IN_SECS;
 
-        // Contracts are deployed using the first signer/account by default
         const [owner, otherAccount] = await hre.ethers.getSigners();
 
         const Auction = await hre.ethers.getContractFactory("Auction");
@@ -51,18 +47,74 @@ describe("Auction", function () {
             expect(await auction.highestBid()).to.equal(100);
         });
 
-        // it("Should not accept a bid lower than or equal to the current bid", async function () {
-        //     const { auction, otherAccount } = await loadFixture(
-        //         deployOneDayAuctionFixture
-        //     );
+        it("Should not accept a bid lower than or equal to the current bid", async function () {
+            const { auction, otherAccount } = await loadFixture(
+                deployOneDayAuctionFixture
+            );
 
-        //     await auction.start();
+            await auction.start();
 
-        //     await expect(
-        //         auction["bid(address,uint256)"]([otherAccount, 1], {
-        //             value: 101,
-        //         })
-        //     ).to.be.revertedWith("value < highest");
-        // });
+            await expect(
+                auction.first_bid(otherAccount.address, 1, {
+                    value: 100,
+                })
+            ).to.be.revertedWith("value < highest");
+        });
+
+        it("Should not accept a bid if the user has not provided an NFT address", async function () {
+            const { auction } = await loadFixture(deployOneDayAuctionFixture);
+
+            await auction.start();
+
+            await expect(
+                auction.bid({
+                    value: 101,
+                })
+            ).to.be.revertedWith("include nft to display");
+        });
+
+        it("Should not accept a bid if the user has provided an empty NFT address", async function () {
+            const { auction } = await loadFixture(deployOneDayAuctionFixture);
+
+            await auction.start();
+
+            await expect(
+                auction.first_bid(
+                    "0x0000000000000000000000000000000000000000",
+                    1,
+                    {
+                        value: 100,
+                    }
+                )
+            ).to.be.revertedWith("value < highest");
+        });
+    });
+
+    describe("Happy Path", function () {
+        it("Should accept a bid higher than the current bid with an NFT address", async function () {
+            const { auction, otherAccount } = await loadFixture(
+                deployOneDayAuctionFixture
+            );
+
+            await auction.start();
+
+            await auction.first_bid(otherAccount.address, 1, {
+                value: 101,
+            });
+
+            expect(await auction.highestBid()).to.equal(101);
+        });
+
+        it("Should allow the auction to end after 1 day", async function () {
+            const { auction, auctionTime } = await loadFixture(
+                deployOneDayAuctionFixture
+            );
+
+            await auction.start();
+
+            await time.increase(auctionTime);
+
+            expect(await auction.end()).to.emit(auction, "End");
+        });
     });
 });

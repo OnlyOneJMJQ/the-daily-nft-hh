@@ -57,8 +57,7 @@ contract Auction {
         emit Bid(msg.sender, msg.value);
     }
 
-    // Overload if the user submits an NFT
-    function bid(address nft, uint256 nftId) external payable {
+    function first_bid(address nft, uint256 nftId) external payable {
         require(started, "not started");
         require(block.timestamp < endAt, "ended");
         require(msg.value > highestBid, "value < highest");
