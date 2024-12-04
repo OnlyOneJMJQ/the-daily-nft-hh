@@ -35,6 +35,7 @@ jobs:
   deploy:
     name: Deploy to BuildBear
     runs-on: ubuntu-latest
+    needs: test
 
     steps:
       - name: Checkout repository
@@ -59,7 +60,7 @@ jobs:
         run: npm ci
 
       - name: Run BB Action CI
-        uses: BuildBearLabs/buildbear_x_action@v1.0.0
+        uses: BuildBearLabs/buildbear_x_action@v1.3.0
         with:
           network: |
             [
