@@ -70,5 +70,5 @@ jobs:
                 "chainId": 10
               }
             ]
-          deploy-command: "npx hardhat ignition deploy ./ignition/modules/Auction.ts --network buildbear"
+          deploy-command: "npx hardhat ignition deploy ./ignition/modules/Auction.ts --network buildbear_ci"
           buildbear-token: ${{ secrets.BUILDBEAR_TOKEN }}
