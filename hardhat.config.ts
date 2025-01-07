@@ -1,5 +1,6 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
+import "@sentio/hardhat-sentio";
 
 const config: HardhatUserConfig = {
   networks: {
@@ -15,7 +16,18 @@ const config: HardhatUserConfig = {
       },
     },
   },
-  solidity: "0.8.24",
+  sentio: {
+    project: "joshbb/the-daily-nft",
+  },
+  solidity: {
+    version: "0.8.24",
+    settings: {
+      optimizer: {
+        enabled: false,
+        runs: 200,
+      },
+    },
+  },
 };
 
 export default config;
