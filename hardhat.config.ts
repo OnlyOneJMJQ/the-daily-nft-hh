@@ -8,6 +8,14 @@ const config: HardhatUserConfig = {
       url: "https://rpc.buildbear.io/criminal-lockjaw-e9468812",
       timeout: 100_000,
     },
+    buildbear_op: {
+      url: "https://rpc.dev.buildbear.io/fair-sandman-f116c9f3",
+      timeout: 100_000,
+      accounts: {
+        mnemonic:
+          "term health walnut lake kiss humor bless snap spawn solution stool thrive",
+      },
+    },
     buildbear_ci: {
       url: process.env.BUILDBEAR_RPC_URL ?? "",
       timeout: 100_000,

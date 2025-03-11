@@ -3,35 +3,6 @@ name: Test and BB Deploy
 on: [push, pull_request]
 
 jobs:
-  test:
-    name: Hardhat Tests
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - name: Use Node.js 20.16.0
-        uses: actions/setup-node@v1
-        with:
-          node-version: 20.16.0
-
-      - name: Cache Node Modules
-        id: cache-node-modules
-        uses: actions/cache@v2
-        with:
-          path: "node_modules"
-          key: node_modules-${{ hashFiles('package-lock.json') }}
-
-      - name: Install dependencies
-        if: steps.cache-node-modules.outputs.cache-hit != 'true'
-        run: npm ci
-
-      - name: Run Tests
-        run: npx hardhat test
-
   deploy:
     name: Deploy to BuildBear
     runs-on: ubuntu-latest
@@ -67,11 +38,37 @@ jobs:
           network: |
             [
               {
-                "chainId": 10
-              },
-              {
-                "chainId": 99
+                "chainId": 1234
               }
             ]
           deploy-command: "npx hardhat ignition deploy ./ignition/modules/Auction.ts --network buildbear_ci"
           buildbear-token: ${{ secrets.BUILDBEAR_TOKEN }}
+
+  test:
+    name: Hardhat Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Use Node.js 20.16.0
+        uses: actions/setup-node@v1
+        with:
+          node-version: 20.16.0
+
+      - name: Cache Node Modules
+        id: cache-node-modules
+        uses: actions/cache@v2
+        with:
+          path: "node_modules"
+          key: node_modules-${{ hashFiles('package-lock.json') }}
+
+      - name: Install dependencies
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Run Tests
+        run: npx hardhat test
