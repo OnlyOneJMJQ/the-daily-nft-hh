@@ -38,7 +38,7 @@ jobs:
           network: |
             [
               {
-                "chainId": 1234
+                "chainId": 1
               }
             ]
           deploy-command: "npx hardhat ignition deploy ./ignition/modules/Auction.ts --network buildbear_ci"
